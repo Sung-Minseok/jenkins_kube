@@ -4,7 +4,7 @@
 
   tasks:
   - name: Build Docker Image
-    command: docker image build -t sms0430/mywebapp ./tomcat-docker-image-build/Dockerfile
+    command: docker image build -t sms0430/mywebapp ./tomcat-docker-image-build/
   - name: Login to Docker Hub
     command: docker login
   - name: Push Image to Docker Hub
