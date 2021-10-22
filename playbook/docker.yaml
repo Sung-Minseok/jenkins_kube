@@ -1,0 +1,29 @@
+- name: Build Docker Image and Push
+  hosts: ansible_host
+  gather_facts: false
+
+  tasks:
+  - name: Build Docker Image
+    command: docker image build -t sms0430/mywebapp .
+  - name: Login to Docker Hub
+    command: docker login
+  - name: Push Image to Docker Hub
+    command: docker push sms0430/mywebapp
+  - name: Remove Local Image
+    command: docker image rm sms0430/mywebapp tomcat:9-jdk11
+
+- name: Run Kubernetes Container
+  hosts: kube_host
+  gather_facts: false
+
+  tasks:
+  - name: Delete Existed Service
+    command: kubectl delete svc mysvc
+    ignore_errors: true
+  - name: Delete Existed Deployment
+    command: kubectl delete deploy myweb
+    ignore_errors: true
+  - name: Create deployment
+    command: kubectl create deployment myweb --replicas=3 --image=sms0430/mywebapp
+  - name: Expose service
+    command: kubectl expose deployment myweb --name mysvc --port 80 --target-port 8080 --type LoadBalancer
